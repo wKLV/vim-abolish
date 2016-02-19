@@ -126,6 +126,16 @@ function! s:snakecase(word)
   return word
 endfunction
 
+function! s:snakeUpper(word)
+  let word = substitute(a:word,'\(_\w\)\|\(\<\w\)', '\U\1\2', 'g')
+"  let word = substitute(a:word,'::','/','g')
+"  let word = substitute(word,'\(\u\+\)\(\u\l\)','\I1_\I2','g')
+"  let word = substitute(word,'\(\l\|\d\)\(\u\)','\I1_\I2','g')
+"  let word = substitute(word,'[.-]','_','g')
+
+  return word
+endfunction
+
 function! s:uppercase(word)
   return toupper(s:snakecase(a:word))
 endfunction
@@ -144,7 +154,8 @@ call extend(Abolish, {
       \ 'snakecase':  s:function('s:snakecase'),
       \ 'uppercase':  s:function('s:uppercase'),
       \ 'dashcase':   s:function('s:dashcase'),
-      \ 'dotcase':    s:function('s:dotcase')
+      \ 'dotcase':    s:function('s:dotcase'),
+      \ 'snakeUpper': s:function('s:snakeUpper')
       \ }, 'keep')
 
 function! s:create_dictionary(lhs,rhs,opts)
@@ -558,7 +569,7 @@ call extend(Abolish.Coercions, {
       \ 'm': Abolish.mixedcase,
       \ 's': Abolish.snakecase,
       \ '_': Abolish.snakecase,
-      \ 'u': Abolish.uppercase,
+      \ 'u': Abolish.snakeUpper,
       \ 'U': Abolish.uppercase,
       \ '-': Abolish.dashcase,
       \ 'k': Abolish.dashcase,
@@ -603,7 +614,8 @@ nnoremap <silent> <Plug>Coerce :<C-U>call <SID>coerce(nr2char(getchar()))<CR>
 
 " }}}1
 
-nmap cr  <Plug>Coerce
+nmap ~  <Plug>Coerce
+vmap ~ <Plug>Coerce
 
 command! -nargs=+ -bang -bar -range=0 -complete=custom,s:Complete Abolish
       \ :exec s:dispatcher(<bang>0,<line1>,<line2>,<count>,[<f-args>])
